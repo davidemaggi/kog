@@ -3,6 +3,7 @@ package k8s
 import (
 	"errors"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/client-go/util/homedir"
 	"log"
 	"os"
@@ -11,20 +12,21 @@ import (
 
 var kubeconfig string
 
-func GetConfig() {
+func GetConfig() (kubeConfig *api.Config, err error) {
 
 	kubeConfigPath, err := FindKubeConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	kubeConfig, err := clientcmd.LoadFromFile(kubeConfigPath)
+	kubeConfig, err = clientcmd.LoadFromFile(kubeConfigPath)
 	if err != nil {
 		log.Fatal(err)
+		return nil, err
 	}
 
 	log.Printf("current context is %s", kubeConfig.CurrentContext)
-
+	return kubeConfig, nil
 	//err = clientcmd.WriteToFile(*kubeConfig, "copy.yaml")
 	//if err != nil {
 	//	log.Fatal(err)

@@ -30,7 +30,7 @@ to quickly create a Cobra application.`,
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Fprintf(os.Stdout, wizard.Reverse("123456789"))
+		wizard.SelectContext()
 		ConfigPath, _ = k8s.FindKubeConfig()
 		fmt.Fprintf(os.Stdout, ConfigPath)
 
