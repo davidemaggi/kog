@@ -2,6 +2,9 @@ package k8s
 
 import (
 	"errors"
+	"golang.org/x/net/context"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/client-go/util/homedir"
@@ -34,6 +37,25 @@ func GetConfig() (kubeConfig *api.Config, err error) {
 
 }
 
+func SaveConfig(filePath string, kubeConfig *api.Config, backup bool) (msg string, err error) {
+
+	if backup {
+		oldConfig, _ := GetConfig()
+		err = clientcmd.WriteToFile(*oldConfig, filePath+".backup")
+		if err != nil {
+			log.Fatal(err)
+			return "Error during backup", err
+		}
+	}
+
+	err = clientcmd.WriteToFile(*kubeConfig, filePath)
+	if err != nil {
+		log.Fatal(err)
+		return "Something happened", err
+	}
+	return "ok", nil
+}
+
 func FindKubeConfig() (string, error) {
 	env := os.Getenv("KUBECONFIG")
 	if env != "" {
@@ -45,4 +67,79 @@ func FindKubeConfig() (string, error) {
 	}
 
 	return "", errors.New("Error Retrieving KubeConfig")
+}
+
+func GetContexts() (ctxs []string, err error) {
+	ctxs = make([]string, 0)
+
+	kubeConfig, err := GetConfig()
+
+	if err != nil {
+		return ctxs, err
+	}
+
+	for s, _ := range kubeConfig.Contexts {
+		ctxs = append(ctxs, s)
+	}
+	return ctxs, nil
+
+}
+
+func GetCurrentContext() (ctx string, err error) {
+
+	kubeConfig, err := GetConfig()
+	if err != nil {
+		return "", err
+	}
+
+	return kubeConfig.CurrentContext, nil
+}
+
+func SetContexts(ctx string) (err error) {
+
+	kubeConfig, err := GetConfig()
+
+	if err != nil {
+		return err
+	}
+
+	kubeConfig.CurrentContext = ctx
+	path, _ := FindKubeConfig()
+	s, err := SaveConfig(path, kubeConfig, true)
+	_ = s
+	return nil
+
+}
+
+func GetNamespaces() (namespaces []string, err error) {
+	kubeConfigPath, err := FindKubeConfig()
+
+	if err != nil {
+		return namespaces, err
+	}
+	config, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
+	if err != nil {
+		log.Fatal(err)
+		return namespaces, err
+	}
+
+	// create the clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		log.Fatal(err)
+		return namespaces, err
+
+	}
+
+	var nsList, errNs = clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
+	if errNs != nil {
+		log.Fatal(errNs)
+		return namespaces, errNs
+
+	}
+	for _, ns := range nsList.Items {
+		namespaces = append(namespaces, ns.Name)
+	}
+	return namespaces, nil
+
 }

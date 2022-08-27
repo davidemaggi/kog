@@ -1,33 +1,37 @@
 package wizard
 
 import (
-	"fmt"
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/davidemaggi/kog/pkg/k8s"
-	"github.com/manifoldco/promptui"
+	"log"
 )
 
-func SelectContext() (result string) {
+func SelectContext() {
 
-	var ctxs = make([]string, 0)
-
-	var config, err = k8s.GetConfig()
-	for s, _ := range config.Contexts {
-		ctxs = append(ctxs, s)
-	}
-
-	prompt := promptui.Select{
-		Label: "Select Context",
-		Items: ctxs,
-	}
-
-	_, result, err = prompt.Run()
+	ctxs, err := k8s.GetContexts()
 
 	if err != nil {
-		fmt.Printf("Prompt failed %v\n", err)
+		log.Fatal("Error getting Contexts")
 		return
 	}
+	currentCtx, err := k8s.GetCurrentContext()
+	newCtx := ""
+	promptCtx := &survey.Select{
+		Message: "Select Context:",
+		Options: ctxs,
+		Default: currentCtx,
+	}
+	survey.AskOne(promptCtx, &newCtx)
 
-	fmt.Printf("You choose %q\n", result)
+	k8s.SetContexts(newCtx)
 
-	return result
+	namespaces, err := k8s.GetNamespaces()
+
+	newNs := ""
+	promptNs := &survey.Select{
+		Message: "Select Namespace:",
+		Options: namespaces,
+	}
+	survey.AskOne(promptNs, &newNs)
+	_ = newNs
 }
