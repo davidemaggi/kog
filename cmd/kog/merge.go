@@ -4,21 +4,17 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package kog
 
 import (
-	"fmt"
-	wizard "github.com/davidemaggi/kog/pkg/wizard"
 	"github.com/spf13/cobra"
-	"os"
+	"log"
 )
 
-var version = "0.0.1"
-var Verbose bool
-var ConfigPath string
-
 // rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
+var mergeCmd = &cobra.Command{
 	Version: version,
-	Use:     "kog",
-	Short:   "A brief description of your application",
+	Use:     "merge",
+	Aliases: []string{"m"},
+	Args:    cobra.ExactArgs(1),
+	Short:   "Merge a new Yaml to your existing KubeConfig",
 	Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
 
@@ -29,18 +25,9 @@ to quickly create a Cobra application.`,
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
 	Run: func(cmd *cobra.Command, args []string) {
-		wizard.SelectContext(Verbose)
+		log.Print(args[0])
 
 	},
-}
-
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "Whoops. There was an error while executing your CLI '%s'", err)
-		os.Exit(1)
-	}
 }
 
 func init() {
@@ -52,7 +39,6 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
-	rootCmd.PersistentFlags().StringVarP(&ConfigPath, "config", "c", "", "verbose output")
+	rootCmd.AddCommand(mergeCmd)
 
 }

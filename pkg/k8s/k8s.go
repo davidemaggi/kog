@@ -28,7 +28,7 @@ func GetConfig() (kubeConfig *api.Config, err error) {
 		return nil, err
 	}
 
-	log.Printf("current context is %s", kubeConfig.CurrentContext)
+	//log.Printf("current context is %s", kubeConfig.CurrentContext)
 	return kubeConfig, nil
 	//err = clientcmd.WriteToFile(*kubeConfig, "copy.yaml")
 	//if err != nil {
@@ -69,12 +69,15 @@ func FindKubeConfig() (string, error) {
 	return "", errors.New("Error Retrieving KubeConfig")
 }
 
-func GetContexts() (ctxs []string, err error) {
+func GetContexts(verbose bool) (ctxs []string, err error) {
 	ctxs = make([]string, 0)
 
 	kubeConfig, err := GetConfig()
 
 	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
 		return ctxs, err
 	}
 
@@ -85,21 +88,29 @@ func GetContexts() (ctxs []string, err error) {
 
 }
 
-func GetCurrentContext() (ctx string, err error) {
+func GetCurrentContext(verbose bool) (ctx string, err error) {
 
 	kubeConfig, err := GetConfig()
 	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+
 		return "", err
 	}
 
 	return kubeConfig.CurrentContext, nil
 }
 
-func SetContexts(ctx string) (err error) {
+func SetContext(ctx string, verbose bool) (err error) {
 
 	kubeConfig, err := GetConfig()
 
 	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+
 		return err
 	}
 
@@ -111,29 +122,61 @@ func SetContexts(ctx string) (err error) {
 
 }
 
-func GetNamespaces() (namespaces []string, err error) {
+func SetNameSpace(ns string, verbose bool) (err error) {
+
+	kubeConfig, err := GetConfig()
+
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+
+		return err
+	}
+
+	kubeConfig.Contexts[kubeConfig.CurrentContext].Namespace = ns
+
+	path, _ := FindKubeConfig()
+	s, err := SaveConfig(path, kubeConfig, true)
+	_ = s
+	return nil
+
+}
+
+func GetNamespaces(verbose bool) (namespaces []string, err error) {
 	kubeConfigPath, err := FindKubeConfig()
 
 	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+
 		return namespaces, err
 	}
 	config, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
 	if err != nil {
-		log.Fatal(err)
+		if verbose {
+			log.Fatal(err)
+		}
 		return namespaces, err
 	}
 
 	// create the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		log.Fatal(err)
+		if verbose {
+			log.Fatal(err)
+		}
 		return namespaces, err
 
 	}
 
 	var nsList, errNs = clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 	if errNs != nil {
-		log.Fatal(errNs)
+
+		if verbose {
+			log.Fatal(errNs)
+		}
 		return namespaces, errNs
 
 	}
