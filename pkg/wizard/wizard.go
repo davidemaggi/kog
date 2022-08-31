@@ -6,16 +6,16 @@ import (
 	"log"
 )
 
-func SelectContext(verbose bool) (err error) {
+func SelectContext(configPath string, verbose bool) (err error) {
 
-	ctxs, err := k8s.GetContexts(verbose)
+	ctxs, err := k8s.GetContexts(configPath, verbose)
 
 	if err != nil {
 
 		log.Fatal("Error getting Contexts")
 		return
 	}
-	currentCtx, err := k8s.GetCurrentContext(verbose)
+	currentCtx, err := k8s.GetCurrentContext(configPath, verbose)
 	newCtx := ""
 	promptCtx := &survey.Select{
 		Message: "Select Context:",
@@ -24,9 +24,9 @@ func SelectContext(verbose bool) (err error) {
 	}
 	survey.AskOne(promptCtx, &newCtx)
 
-	k8s.SetContext(newCtx, verbose)
+	k8s.SetContext(configPath, newCtx, verbose)
 
-	namespaces, err := k8s.GetNamespaces(verbose)
+	namespaces, err := k8s.GetNamespaces(configPath, verbose)
 
 	if err != nil {
 
@@ -36,7 +36,7 @@ func SelectContext(verbose bool) (err error) {
 	newNs := ""
 	promptNs := &survey.Select{
 		Message: "Select Namespace:",
-		Options: append(namespaces, "dEfAulT3"),
+		Options: namespaces,
 	}
 	survey.AskOne(promptNs, &newNs)
 

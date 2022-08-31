@@ -12,6 +12,7 @@ import (
 
 var version = "0.0.1"
 var Verbose bool
+var Force bool
 var ConfigPath string
 
 // rootCmd represents the base command when called without any subcommands
@@ -29,7 +30,7 @@ to quickly create a Cobra application.`,
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
 	Run: func(cmd *cobra.Command, args []string) {
-		wizard.SelectContext(Verbose)
+		wizard.SelectContext(ConfigPath, Verbose)
 
 	},
 }
@@ -53,6 +54,7 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
-	rootCmd.PersistentFlags().StringVarP(&ConfigPath, "config", "c", "", "verbose output")
+	rootCmd.PersistentFlags().StringVarP(&ConfigPath, "config", "c", "", "KubeConfig Path")
+	rootCmd.PersistentFlags().BoolVarP(&Force, "force", "f", false, "Force Flag")
 
 }
