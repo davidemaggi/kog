@@ -4,8 +4,10 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package kog
 
 import (
-	"github.com/spf13/cobra"
 	"log"
+
+	"github.com/davidemaggi/kog/pkg/k8s"
+	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -26,7 +28,8 @@ to quickly create a Cobra application.`,
 	// Run: func(cmd *cobra.Command, args []string) { },
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Print(args[0])
-
+		xxx, _ := k8s.FindKubeConfig()
+		k8s.MergeConfigs(args[0], xxx, false, Verbose)
 	},
 }
 

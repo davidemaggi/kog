@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -16,11 +17,13 @@ import (
 
 var kubeconfig string
 
-func GetConfig() (kubeConfig *api.Config, err error) {
+func GetConfig(kubeConfigPath string) (kubeConfig *api.Config, err error) {
 
-	kubeConfigPath, err := FindKubeConfig()
-	if err != nil {
-		log.Fatal(err)
+	if kubeConfigPath == "" {
+		kubeConfigPath, err = FindKubeConfig()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	kubeConfig, err = clientcmd.LoadFromFile(kubeConfigPath)
@@ -41,7 +44,7 @@ func GetConfig() (kubeConfig *api.Config, err error) {
 func SaveConfig(filePath string, kubeConfig *api.Config, backup bool) (msg string, err error) {
 
 	if backup {
-		oldConfig, _ := GetConfig()
+		oldConfig, _ := GetConfig("")
 		err = clientcmd.WriteToFile(*oldConfig, filePath+".backup")
 		if err != nil {
 			log.Fatal(err)
@@ -73,7 +76,7 @@ func FindKubeConfig() (string, error) {
 func GetContexts(verbose bool) (ctxs []string, err error) {
 	ctxs = make([]string, 0)
 
-	kubeConfig, err := GetConfig()
+	kubeConfig, err := GetConfig("")
 
 	if err != nil {
 		if verbose {
@@ -91,7 +94,7 @@ func GetContexts(verbose bool) (ctxs []string, err error) {
 
 func GetCurrentContext(verbose bool) (ctx string, err error) {
 
-	kubeConfig, err := GetConfig()
+	kubeConfig, err := GetConfig("")
 	if err != nil {
 		if verbose {
 			log.Fatal(err)
@@ -105,7 +108,7 @@ func GetCurrentContext(verbose bool) (ctx string, err error) {
 
 func SetContext(ctx string, verbose bool) (err error) {
 
-	kubeConfig, err := GetConfig()
+	kubeConfig, err := GetConfig("")
 
 	if err != nil {
 		if verbose {
@@ -125,7 +128,7 @@ func SetContext(ctx string, verbose bool) (err error) {
 
 func SetNameSpace(ns string, verbose bool) (err error) {
 
-	kubeConfig, err := GetConfig()
+	kubeConfig, err := GetConfig("")
 
 	if err != nil {
 		if verbose {
@@ -188,4 +191,48 @@ func GetNamespaces(verbose bool) (namespaces []string, err error) {
 
 }
 
-func MergeConfigs(newFile string) (kubeConfig *api.Config, err error) {}
+func MergeConfigs(newFile string, oldfile string, force bool, verbose bool) (kubeConfig *api.Config, err error) {
+
+	oldConfig, err := GetConfig(oldfile)
+
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+		return nil, err
+
+	}
+	origConfig := oldConfig.DeepCopy()
+	newConfig, err := GetConfig(newFile)
+
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+		return nil, err
+
+	}
+
+	for index, element := range newConfig.Contexts {
+		// index is the index where we are
+		// element is the element from someSlice for where we are
+
+		fmt.Println(index + " - " + element.Cluster)
+
+		exists := oldConfig.Contexts[index] != nil
+
+		if exists {
+
+			if force {
+				oldConfig.Contexts[index] = element.DeepCopy()
+			}
+
+		} else {
+			oldConfig.Contexts[index] = element.DeepCopy()
+		}
+
+	}
+	_ = origConfig
+	_ = oldConfig
+	return nil, nil
+}
