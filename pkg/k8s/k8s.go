@@ -2,15 +2,16 @@ package k8s
 
 import (
 	"errors"
+	"log"
+	"os"
+	"path/filepath"
+
 	"golang.org/x/net/context"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/client-go/util/homedir"
-	"log"
-	"os"
-	"path/filepath"
 )
 
 var kubeconfig string
@@ -186,3 +187,5 @@ func GetNamespaces(verbose bool) (namespaces []string, err error) {
 	return namespaces, nil
 
 }
+
+func MergeConfigs(newFile string) (kubeConfig *api.Config, err error) {}
