@@ -44,3 +44,25 @@ func SelectContext(configPath string, verbose bool) (err error) {
 
 	return nil
 }
+func DeleteContext(configPath string, verbose bool) (err error) {
+
+	ctxs, err := k8s.GetContexts(configPath, verbose)
+
+	if err != nil {
+
+		log.Fatal("Error getting Contexts")
+		return
+	}
+	currentCtx, err := k8s.GetCurrentContext(configPath, verbose)
+	delCtx := ""
+	promptCtx := &survey.Select{
+		Message: "Delete Context:",
+		Options: ctxs,
+		Default: currentCtx,
+	}
+	survey.AskOne(promptCtx, &delCtx)
+
+	k8s.DeleteContext(configPath, delCtx, verbose)
+
+	return nil
+}

@@ -4,29 +4,24 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package kog
 
 import (
-	"github.com/davidemaggi/kog/pkg/merge"
+	"github.com/davidemaggi/kog/pkg/wizard"
 	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the base command when called without any subcommands
-var mergeCmd = &cobra.Command{
+var deleteCmd = &cobra.Command{
 	Version: version,
-	Use:     "merge",
-	Aliases: []string{"m"},
-	Args:    cobra.ExactArgs(1),
-	Short:   "Merge a new Yaml config to your existing KubeConfig",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:     "delete",
+	Aliases: []string{"d"},
+	Short:   "Delete the selected context",
+	Long: `This command deletes the selected context from your kubeconfig file.
+Clusters, Users etc... remain untouched`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
 	Run: func(cmd *cobra.Command, args []string) {
-		//log.Print(args[0])
-		merge.MergeConfig(args[0], ConfigPath, Force, Verbose)
+		wizard.DeleteContext(ConfigPath, Verbose)
+
 	},
 }
 
@@ -39,6 +34,6 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.AddCommand(mergeCmd)
+	rootCmd.AddCommand(deleteCmd)
 
 }

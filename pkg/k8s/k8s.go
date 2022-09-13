@@ -128,6 +128,38 @@ func SetContext(configPath string, ctx string, verbose bool) (err error) {
 
 }
 
+func DeleteContext(configPath string, ctx string, verbose bool) (err error) {
+
+	kubeConfig, err := GetConfig(configPath)
+
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+
+		return err
+	}
+
+	if ctx == kubeConfig.CurrentContext {
+
+		//You are deleting the current default
+		kubeConfig.CurrentContext = ""
+
+	}
+
+	delete(kubeConfig.Contexts, ctx)
+
+	if configPath == "" {
+		configPath, _ = FindKubeConfig()
+	}
+
+	s, err := SaveConfig(configPath, kubeConfig, true)
+
+	_ = s
+	return nil
+
+}
+
 func SetNameSpace(ns string, verbose bool) (err error) {
 
 	kubeConfig, err := GetConfig("")
