@@ -23,5 +23,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
-          ldflags: " -w -s -X main.Version=`git describe --tags` -X main.Build=`date +%FT%T%z`"
+          ldflags: -w -s -X main.Version='git describe --tags' -X main.Build='date +%FT%T%z'
           binary_name: "kog"
