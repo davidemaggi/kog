@@ -14,7 +14,6 @@
     <authors>Davide Maggi</authors>
     <projectUrl>https://github.com/davidemaggi/kog</projectUrl>
     <licenseUrl>https://github.com/davidemaggi/kog/blob/main/LICENSE</licenseUrl>
-    <packageSourceUrl>https://github.com/davidemaggi/kog/tree/main/deploy/chocolatey</packageSourceUrl>
     <iconUrl>https://github.com/davidemaggi/kog/blob/main/imgs/icon.png?raw=true</iconUrl>
 
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
