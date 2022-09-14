@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop';
 
 $packageName= 'kog'
-$version = 'v0.0.1-alpha-02'
+$version = 'v0.0.1-alpha-03'
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 $url64        = "https://github.com/davidemaggi/kog/releases/download/$version/kog-$version-windows-386.zip"
 $url        = "https://github.com/davidemaggi/kog/releases/download/$version/kog-$version-windows-amd64.zip"

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>kog</id>
-    <version>0.0.1-alpha-02</version>
+    <version>0.0.1-alpha-03</version>
     <packageSourceUrl>https://github.com/davidemaggi/dkog/tree/main/deploy/chocolatey</packageSourceUrl>
     <!-- owners is a poor name for maintainers of the package. It sticks around by this name for compatibility reasons. It basically means you. -->
     <owners>Davide Maggi</owners>
@@ -14,6 +14,9 @@
     <authors>Davide Maggi</authors>
     <projectUrl>https://github.com/davidemaggi/kog</projectUrl>
     <licenseUrl>https://github.com/davidemaggi/kog/blob/main/LICENSE</licenseUrl>
+    <packageSourceUrl>https://github.com/davidemaggi/kog/tree/main/deploy/chocolatey</packageSourceUrl>
+    <iconUrl>https://github.com/davidemaggi/kog/blob/main/imgs/icon.png</iconUrl>
+
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <tags>kog kubernetes k8s config kubeconfig</tags>
     <summary>A simple CLI to manage your local kubeconfig file</summary>
@@ -24,7 +27,9 @@
     * Merge - To merge your kubeconfig file with a new yaml.
     * Delete - To delete a context from your local kubeconfig.
     </description>
-    <!--releaseNotes>See https://github.com/mtirion/tirchocotestnew/blob/main/RELEASENOTE.md</releaseNotes -->
+
+
+    <releaseNotes>See https://github.com/davidemaggi/kog/releases</releaseNotes>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />

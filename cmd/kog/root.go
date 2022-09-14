@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-var version = "0.0.0"
+var version = "0.0.1-alpha-03"
 var Verbose bool
 var Force bool
 var ConfigPath string
