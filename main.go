@@ -9,9 +9,8 @@ import (
 
 var (
 	Version string = "0.0.0"
-	Build   string = "yyyymmdd"
 )
 
 func main() {
-	kog.Execute(Version, Build)
+	kog.Execute(Version)
 }
