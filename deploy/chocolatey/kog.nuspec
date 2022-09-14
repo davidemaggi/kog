@@ -3,7 +3,7 @@
   <metadata>
     <id>kog</id>
     <version>0.0.1-alpha-03</version>
-    <packageSourceUrl>https://github.com/davidemaggi/dkog/tree/main/deploy/chocolatey</packageSourceUrl>
+    <packageSourceUrl>https://github.com/davidemaggi/kog/tree/main/deploy/chocolatey</packageSourceUrl>
     <!-- owners is a poor name for maintainers of the package. It sticks around by this name for compatibility reasons. It basically means you. -->
     <owners>Davide Maggi</owners>
     <!-- ============================== -->
