@@ -7,6 +7,11 @@ import (
 	"github.com/davidemaggi/kog/cmd/kog"
 )
 
+var (
+	Version string = "0.0.0"
+	Build   string = "yyyymmdd"
+)
+
 func main() {
-	kog.Execute()
+	kog.Execute(Version, Build)
 }
