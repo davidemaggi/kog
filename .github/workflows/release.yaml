@@ -30,5 +30,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
-          ldflags: -w -s -X main.Version='${{env.GITHUB_REF_NAME}}'
           binary_name: "kog"
