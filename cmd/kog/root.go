@@ -5,12 +5,13 @@ package kog
 
 import (
 	"fmt"
+	"os"
+
 	wizard "github.com/davidemaggi/kog/pkg/wizard"
 	"github.com/spf13/cobra"
-	"os"
 )
 
-var version = "0.0.1-alpha-03"
+var version = "0.0.1-alpha-04"
 var Verbose bool
 var Force bool
 var ConfigPath string
