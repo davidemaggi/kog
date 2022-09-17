@@ -1,12 +1,12 @@
 $ErrorActionPreference = 'Stop';
 
 $packageName= 'kog'
-$version = 'v0.0.1-alpha-04'
+$version = '@@VERSION@@'
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$url        = "https://github.com/davidemaggi/kog/releases/download/$version/kog-$version-windows-386.zip"
-$url64        = "https://github.com/davidemaggi/kog/releases/download/$version/kog-$version-windows-amd64.zip"
-$hash = '405f484ce30cf5363a75fc7273012234'
-$hash64 = '483e95f90e9a9bccab28f00de9786e23'
+$url        = "https://github.com/davidemaggi/kog/releases/download/$version/kog-$version-windows-386-signed.zip"
+$url64        = "https://github.com/davidemaggi/kog/releases/download/$version/kog-$version-windows-amd64-signed.zip"
+$hash = '@@HASH_X86@@'
+$hash64 = '@@HASH_X64@@'
 $packageArgs = @{
   packageName   = $packageName
   unzipLocation = $toolsDir
