@@ -1,4 +1,7 @@
-cd .\deploy\chocolatey
+Set-Location .\deploy\chocolatey
+
+Get-Location
+
 choco install windows-sdk-10-version-2104-all -y
 choco install gh -y
 choco setapikey $env:CHOCO_TOKEN
@@ -6,7 +9,7 @@ choco setapikey $env:CHOCO_TOKEN
 #Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\"
 $SignTool= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.20348.0\x64\signtool.exe"
 Get-ChildItem
-cat cert.txt
+Get-Content cert.txt
 $b64=Get-Content -Path cert.txt
 Write-Host $b64
 $bytes = [Convert]::FromBase64String($b64)
