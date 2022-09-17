@@ -7,6 +7,7 @@ Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\"
 $SignTool= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.20348.0\x64\signtool.exe"
 
 $b64=Get-Content -Path "cert.txt"
+Write-Host $b64
 $bytes = [Convert]::FromBase64String($b64)
 [IO.File]::WriteAllBytes("cert.pfx", $bytes)
 
