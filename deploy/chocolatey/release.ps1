@@ -8,12 +8,8 @@ choco setapikey $env:CHOCO_TOKEN
 
 #Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\"
 $SignTool= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.20348.0\x64\signtool.exe"
-Get-ChildItem
 
-$b64=Get-Content -Path cert.txt
 
-$bytes = [Convert]::FromBase64String($b64)
-[IO.File]::WriteAllBytes("cert.pfx", $bytes)
 
 Get-ChildItem
 
@@ -42,8 +38,8 @@ Get-ChildItem
 
 # Sign the Exe File
 
-& $SignTool sign /f "cert.pfx"  $x64Dir"\kog.exe"
-& $SignTool sign /f "cert.pfx"  $x86Dir"\kog.exe"
+& $SignTool sign /f "cert.pfx" /p "$env:CODE_SIGN"  $x64Dir"\kog.exe"
+& $SignTool sign /f "cert.pfx" /p "$env:CODE_SIGN" $x86Dir"\kog.exe"
 
 Compress-Archive -Path $x64Dir\* -DestinationPath $x64Dir"-signed.zip"
 Compress-Archive -Path $x86Dir\* -DestinationPath $x86Dir"-signed.zip"

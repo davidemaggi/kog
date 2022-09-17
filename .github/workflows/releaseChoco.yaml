@@ -6,9 +6,6 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v2
-      - name: Get CodeSign Cert
-        run: echo "${{ secrets.CODE_SIGN }}" | Out-File -FilePath .\deploy\chocolatey\cert.txt
-        shell: pwsh
       - name: Download, Sign & Upload
         run: ./deploy/chocolatey/release.ps1
         shell: pwsh
