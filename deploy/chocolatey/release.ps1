@@ -75,5 +75,5 @@ Get-ChildItem
 
 choco pack kog.nuspec
 
-choco push "kog."$tagStrip".nupkg" --source https://push.chocolatey.org/
+choco push kog.$tagStrip.nupkg --source https://push.chocolatey.org/
 
