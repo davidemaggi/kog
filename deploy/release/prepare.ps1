@@ -10,6 +10,5 @@ choco install windows-sdk-10-version-2104-all -y
 choco install golang -y
 
 
-
-dir "C:\Program Files (x86)\Windows Kits\10\bin\10.0. 19041.0\x64\"
-dir "C:\Program Files (x86)\Windows Kits\10\bin\"
+Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\"
+Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\10.0. 2104.0\x64\"
