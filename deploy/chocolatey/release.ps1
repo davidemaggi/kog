@@ -1,5 +1,5 @@
 choco install windows-sdk-10-version-2104-all -y
-
+choco install gh -y
 choco setapikey $env:CHOCO_TOKEN
 
 Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\"
@@ -14,11 +14,9 @@ $tag=$env:RELEASE
 $tagStrip=$tag.substring(1)
 
 $x64File="kog-$($tag)-windows-amd64.zip"
-$x64FileAsh="kog-$($tag)-windows-amd64.zip.md5"
 $x64Url= "https://github.com/davidemaggi/kog/releases/download/$($tag)/$($x64File)"
 
 $x86File="kog-$($tag)-windows-386.zip"
-$x86FileAsh="kog-$($tag)-windows-386.zip.md5"
 $x86Url= "https://github.com/davidemaggi/kog/releases/download/$($tag)/$($x86File)"
 
 # Downloaad the binaries
@@ -60,6 +58,10 @@ $md5x86= Get-FileHash $x86Dir"-signed.zip" -Algorithm MD5
 Out-File -FilePath $x64Dir"-signed.zip.md5" -InputObject $md5x64
 Out-File -FilePath $x86Dir"-signed.zip.md5" -InputObject $md5x86
 
+gh release upload $tag $x64Dir"-signed.zip"
+gh release upload $tag $x64Dir"-signed.zip"
+gh release upload $tag $x86Dir"-signed.zip"
+gh release upload $tag $x86Dir"-signed.md5"
 
 $chocoScript=$chocoScript.Replace("@@VERSION@@",$tag)+""
 $chocoScript=$chocoScript.Replace("@@HASH_X64@@",$md5x64.Hash)+""
