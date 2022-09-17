@@ -1,6 +1,6 @@
 choco install windows-sdk-10-version-2104-all -y
 
-choco setapikey $Env.CHOCO_TOKEN
+choco setapikey $env.CHOCO_TOKEN
 
 Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\"
 $SignTool= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.20348.0\x64\signtool.exe"
@@ -10,7 +10,7 @@ $bytes = [Convert]::FromBase64String($env.CODE_SIGN)
 
 Get-ChildItem
 
-$tag=$Env.RELEASE
+$tag=$env.RELEASE
 $tagStrip=$tag.substring(1)
 
 $x64File="kog-$($tag)-windows-amd64.zip"
