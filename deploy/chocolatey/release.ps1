@@ -13,7 +13,7 @@ $SignTool= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.20348.0\x64\signtool
 
 Get-ChildItem
 
-$tag="v0.0.1-alpha-11"
+$tag=$env:VERSION
 $tagStrip=$tag.substring(1)
 
 $x64File="kog-$($tag)-windows-amd64.zip"
@@ -74,6 +74,6 @@ Out-File -FilePath .\tools\chocolateyinstall.ps1 -InputObject $chocoScript
 Get-ChildItem
 
 choco pack kog.nuspec
-
-choco push kog.$tagStrip.nupkg --source https://push.chocolatey.org/
+$nupkg="kog."+$tagStrip+".nupkg"
+choco push $nupkg --source https://push.chocolatey.org/
 
