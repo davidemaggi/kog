@@ -1,3 +1,4 @@
+cd .\deploy\chocolatey
 choco install windows-sdk-10-version-2104-all -y
 choco install gh -y
 choco setapikey $env:CHOCO_TOKEN
@@ -59,9 +60,9 @@ Out-File -FilePath $x64Dir"-signed.zip.md5" -InputObject $md5x64
 Out-File -FilePath $x86Dir"-signed.zip.md5" -InputObject $md5x86
 
 gh release upload $tag $x64Dir"-signed.zip"
-gh release upload $tag $x64Dir"-signed.zip"
+gh release upload $tag $x64Dir"-signed.zip.md5"
 gh release upload $tag $x86Dir"-signed.zip"
-gh release upload $tag $x86Dir"-signed.md5"
+gh release upload $tag $x86Dir"-signed.zip.md5"
 
 $chocoScript=$chocoScript.Replace("@@VERSION@@",$tag)+""
 $chocoScript=$chocoScript.Replace("@@HASH_X64@@",$md5x64.Hash)+""
