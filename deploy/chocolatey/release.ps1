@@ -4,8 +4,8 @@ Get-Location
 
 choco install windows-sdk-10-version-2104-all -y
 choco install gh -y
-choco setapikey $env:CHOCO_TOKEN
 
+choco apikey --key $env:CHOCO_TOKEN --source https://push.chocolatey.org/
 #Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\"
 $SignTool= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.20348.0\x64\signtool.exe"
 
@@ -75,5 +75,5 @@ Get-ChildItem
 
 choco pack kog.nuspec
 
-choco push "kog."$tagStrip".nupkg"
+choco push "kog."$tagStrip".nupkg" --source https://push.chocolatey.org/
 
