@@ -1,4 +1,4 @@
-name: Download, Sign and upload windows release
+name: Build, Sign and upload windows release
 on: workflow_dispatch
 jobs:
   build:
@@ -6,7 +6,15 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v2
-      - run: ./deploy/codesign/codesign.ps1
+      - run: ./deploy/release/prepare.ps1
         shell: pwsh
         env:
           CHOCO_TOKEN: ${{ secrets.CHOCO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE: ${{ github.ref_name}}
+      - run: ./deploy/release/build.ps1
+        shell: pwsh
+        env:
+          CHOCO_TOKEN: ${{ secrets.CHOCO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE: ${{ github.ref_name}}
