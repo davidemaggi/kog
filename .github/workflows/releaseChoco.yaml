@@ -1,5 +1,9 @@
-name: Build, Sign and upload windows release to chocolatey
-on: workflow_dispatch
+name: CD chocolatey
+on:
+   workflow_run:
+      workflows: [ "CI release" ]
+      types:
+      - completed
 jobs:
   build:
     runs-on: windows-latest
