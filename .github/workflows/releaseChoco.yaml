@@ -1,9 +1,6 @@
 name: CD chocolatey
-on:
-   workflow_run:
-      workflows: [ "CI release" ]
-      types:
-      - completed
+on: workflow_dispatch
+
 jobs:
   build:
     runs-on: windows-latest
