@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var version = "0.0.1-alpha-04"
+var version = "1.0.0-beta-01"
 var Verbose bool
 var Force bool
 var ConfigPath string
