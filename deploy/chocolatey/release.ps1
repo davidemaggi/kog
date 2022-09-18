@@ -9,6 +9,7 @@ choco apikey --key $env:CHOCO_TOKEN --source https://push.chocolatey.org/
 #Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\"
 $SignTool= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.20348.0\x64\signtool.exe"
 
+Invoke-WebRequest -URI $env:CERTIFICATE -OutFile "cert.pxf"
 
 
 Get-ChildItem
