@@ -11,9 +11,6 @@ $SignTool= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.20348.0\x64\signtool
 
 Invoke-WebRequest -URI $env:CERTIFICATE -OutFile "cert.pxf"
 
-
-Get-ChildItem
-
 $tag=$env:RELEASE
 $tagStrip=$tag.substring(1)
 
@@ -34,8 +31,6 @@ $x64Dir=$x64File.replace('.zip','')
 
 Expand-Archive -LiteralPath $x64File -DestinationPath $x64Dir
 Expand-Archive -LiteralPath $x86File -DestinationPath $x86Dir
-
-Get-ChildItem
 
 # Sign the Exe File
 
@@ -72,7 +67,6 @@ $chocoScript=$chocoScript.Replace("@@HASH_X64@@",$md5x64.Hash)+""
 $chocoScript=$chocoScript.Replace("@@HASH_X86@@",$md5x86.Hash)+""
 
 Out-File -FilePath .\tools\chocolateyinstall.ps1 -InputObject $chocoScript
-Get-ChildItem
 
 choco pack kog.nuspec
 $nupkg="kog."+$tagStrip+".nupkg"
