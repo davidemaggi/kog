@@ -1,6 +1,7 @@
-Set-Location .\deploy\chocolatey
+$baseRoot="D:\a\kog\kog\deploy\chocolatey\"
 
-Get-Location
+Set-Location $baseRoot
+
 
 choco install windows-sdk-10-version-2104-all -y
 #choco install gh -y
@@ -9,8 +10,9 @@ choco apikey --key $env:CHOCO_TOKEN --source https://push.chocolatey.org/
 #Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\"
 $SignTool= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.20348.0\x64\signtool.exe"
 
+
 Invoke-WebRequest -URI "$env:CERTIFICATE" -OutFile "cert.pxf"
-dir
+
 $tag=$env:RELEASE
 $tagStrip=$tag.substring(1)
 
@@ -34,8 +36,8 @@ Expand-Archive -LiteralPath $x86File -DestinationPath $x86Dir
 
 # Sign the Exe File
 
-& $SignTool sign /f "cert.pfx" /p "$env:CODE_SIGN"  $x64Dir"\kog.exe"
-& $SignTool sign /f "cert.pfx" /p "$env:CODE_SIGN" $x86Dir"\kog.exe"
+& $SignTool sign /f $baseRoot"cert.pfx" /p "$env:CODE_SIGN"  $x64Dir"\kog.exe"
+& $SignTool sign /f $baseRoot"cert.pfx" /p "$env:CODE_SIGN" $x86Dir"\kog.exe"
 
 Compress-Archive -Path $x64Dir\* -DestinationPath $x64Dir"-signed.zip"
 Compress-Archive -Path $x86Dir\* -DestinationPath $x86Dir"-signed.zip"
