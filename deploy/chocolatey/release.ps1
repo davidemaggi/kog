@@ -11,7 +11,7 @@ choco apikey --key $env:CHOCO_TOKEN --source https://push.chocolatey.org/
 $SignTool= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.20348.0\x64\signtool.exe"
 
 
-Invoke-WebRequest -URI "$env:CERTIFICATE" -OutFile $baseRoot"cert.pxf"
+Invoke-WebRequest -URI "$env:CERTIFICATE" -OutFile "cert.pfx"
 
 $tag=$env:RELEASE
 $tagStrip=$tag.substring(1)
@@ -36,8 +36,8 @@ Expand-Archive -LiteralPath $x86File -DestinationPath $x86Dir
 
 # Sign the Exe File
 
-& $SignTool sign /f $baseRoot"cert.pfx" /p "$env:CODE_SIGN"  $x64Dir"\kog.exe"
-& $SignTool sign /f $baseRoot"cert.pfx" /p "$env:CODE_SIGN" $x86Dir"\kog.exe"
+& $SignTool sign /f "cert.pfx" /p "$env:CODE_SIGN"  $x64Dir"\kog.exe"
+& $SignTool sign /f "cert.pfx" /p "$env:CODE_SIGN" $x86Dir"\kog.exe"
 
 Compress-Archive -Path $x64Dir\* -DestinationPath $x64Dir"-signed.zip"
 Compress-Archive -Path $x86Dir\* -DestinationPath $x86Dir"-signed.zip"
