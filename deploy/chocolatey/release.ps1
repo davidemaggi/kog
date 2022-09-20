@@ -1,6 +1,7 @@
-Set-Location .\deploy\chocolatey
+$baseRoot="D:\a\kog\kog\deploy\chocolatey\"
 
-Get-Location
+Set-Location $baseRoot
+
 
 choco install windows-sdk-10-version-2104-all -y
 #choco install gh -y
@@ -9,8 +10,9 @@ choco apikey --key $env:CHOCO_TOKEN --source https://push.chocolatey.org/
 #Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\"
 $SignTool= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.20348.0\x64\signtool.exe"
 
+
 Invoke-WebRequest -URI "$env:CERTIFICATE" -OutFile "cert.pxf"
-dir
+
 $tag=$env:RELEASE
 $tagStrip=$tag.substring(1)
 
@@ -21,12 +23,12 @@ $x86File="kog-$($tag)-windows-386.zip"
 $x86Url= "https://github.com/davidemaggi/kog/releases/download/$($tag)/$($x86File)"
 
 # Downloaad the binaries
-Invoke-WebRequest -URI $x64Url -OutFile $x64File
-Invoke-WebRequest -URI $x86Url -OutFile $x86File
+Invoke-WebRequest -URI $x64Url -OutFile $baseRoot$x64File
+Invoke-WebRequest -URI $x86Url -OutFile $baseRoot$x86File
 
 # Extract the binaries
-$x86Dir=$x86File.replace('.zip','')
-$x64Dir=$x64File.replace('.zip','')
+$x86Dir=$baseRoot+$x86File.replace('.zip','')
+$x64Dir=$baseRoot+$x64File.replace('.zip','')
 
 
 Expand-Archive -LiteralPath $x64File -DestinationPath $x64Dir
@@ -34,8 +36,8 @@ Expand-Archive -LiteralPath $x86File -DestinationPath $x86Dir
 
 # Sign the Exe File
 
-& $SignTool sign /f "cert.pfx" /p "$env:CODE_SIGN"  $x64Dir"\kog.exe"
-& $SignTool sign /f "cert.pfx" /p "$env:CODE_SIGN" $x86Dir"\kog.exe"
+& $SignTool sign /f $baseRoot"cert.pfx" /p "$env:CODE_SIGN"  $x64Dir"\kog.exe"
+& $SignTool sign /f $baseRoot"cert.pfx" /p "$env:CODE_SIGN" $x86Dir"\kog.exe"
 
 Compress-Archive -Path $x64Dir\* -DestinationPath $x64Dir"-signed.zip"
 Compress-Archive -Path $x86Dir\* -DestinationPath $x86Dir"-signed.zip"
