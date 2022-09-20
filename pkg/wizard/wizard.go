@@ -18,9 +18,10 @@ func SelectContext(configPath string, verbose bool) (err error) {
 	currentCtx, err := k8s.GetCurrentContext(configPath, verbose)
 	newCtx := ""
 	promptCtx := &survey.Select{
-		Message: "Select Context:",
-		Options: ctxs,
-		Default: currentCtx,
+		Message:  "Select Context:",
+		Options:  ctxs,
+		Default:  currentCtx,
+		PageSize: 20,
 	}
 	survey.AskOne(promptCtx, &newCtx)
 
@@ -35,8 +36,9 @@ func SelectContext(configPath string, verbose bool) (err error) {
 	}
 	newNs := ""
 	promptNs := &survey.Select{
-		Message: "Select Namespace:",
-		Options: namespaces,
+		Message:  "Select Namespace:",
+		Options:  namespaces,
+		PageSize: 20,
 	}
 	survey.AskOne(promptNs, &newNs)
 
