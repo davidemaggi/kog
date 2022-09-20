@@ -59,10 +59,10 @@ $md5x86= Get-FileHash $x86Dir"-signed.zip" -Algorithm MD5
 Out-File -FilePath $x64Dir"-signed.zip.md5" -InputObject $md5x64
 Out-File -FilePath $x86Dir"-signed.zip.md5" -InputObject $md5x86
 
-gh release upload $tag $x64Dir"-signed.zip"
-gh release upload $tag $x64Dir"-signed.zip.md5"
-gh release upload $tag $x86Dir"-signed.zip"
-gh release upload $tag $x86Dir"-signed.zip.md5"
+gh release upload $tag $x64Dir"-signed.zip" --clobber
+gh release upload $tag $x64Dir"-signed.zip.md5" --clobber
+gh release upload $tag $x86Dir"-signed.zip" --clobber
+gh release upload $tag $x86Dir"-signed.zip.md5" --clobber
 
 $chocoScript=$chocoScript.Replace("@@VERSION@@",$tag)+""
 $chocoScript=$chocoScript.Replace("@@HASH_X64@@",$md5x64.Hash)+""
