@@ -23,12 +23,12 @@ $x86File="kog-$($tag)-windows-386.zip"
 $x86Url= "https://github.com/davidemaggi/kog/releases/download/$($tag)/$($x86File)"
 
 # Downloaad the binaries
-Invoke-WebRequest -URI $x64Url -OutFile $baseRoot$x64File
-Invoke-WebRequest -URI $x86Url -OutFile $baseRoot$x86File
+Invoke-WebRequest -URI $x64Url -OutFile $x64File
+Invoke-WebRequest -URI $x86Url -OutFile $x86File
 
 # Extract the binaries
-$x86Dir=$baseRoot+$x86File.replace('.zip','')
-$x64Dir=$baseRoot+$x64File.replace('.zip','')
+$x86Dir=$x86File.replace('.zip','')
+$x64Dir=$x64File.replace('.zip','')
 
 
 Expand-Archive -LiteralPath $x64File -DestinationPath $x64Dir
