@@ -72,7 +72,7 @@ func FindKubeConfig() (string, error) {
 	return "", errors.New("Error Retrieving KubeConfig")
 }
 
-func GetContexts(configPath string, verbose bool) (ctxs []string, err error) {
+func GetContexts(configPath string, verbose bool) (ctxs []string, rawCtxs map[string]*api.Context, err error) {
 	ctxs = make([]string, 0)
 
 	kubeConfig, err := GetConfig(configPath)
@@ -81,13 +81,13 @@ func GetContexts(configPath string, verbose bool) (ctxs []string, err error) {
 		if verbose {
 			log.Fatal(err)
 		}
-		return ctxs, err
+		return ctxs, nil, err
 	}
 
 	for s, _ := range kubeConfig.Contexts {
 		ctxs = append(ctxs, s)
 	}
-	return ctxs, nil
+	return ctxs, kubeConfig.Contexts, nil
 
 }
 
