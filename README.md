@@ -2,18 +2,18 @@
 A KubeConfig manager for the lazy developer of today
 
 ## Wizard
-The main kog command, it will prompt the available Contexts and Namespaces to let you switch between them in a lazy way...
+The main kog command, it will prompt the available Contexts and Namespaces to let you switch between them in a fast, lazy way...
 oh, and it allows you to filter... in case you have a gazillion of contexts
 ```shell
 kog
 ```
-### Vanilla
+### Arrow Keys
 ![](https://github.com/davidemaggi/kog/blob/main/imgs/readme/gif_wizard1.gif?raw=true)
 ### With Filter
 ![](https://github.com/davidemaggi/kog/blob/main/imgs/readme/gif_wizard2.gif?raw=true)
 
 ## Merge
->With great projects comes many clusters (cit. uncle Ben).
+>With great projects comes great clusters (cit. Uncle Ben).
 
 This Command will merge the desired yaml file in your kubeconfig file
 ```shell
@@ -21,15 +21,23 @@ kog merge your/file/path/config.yaml
 ```
 ![](https://github.com/davidemaggi/kog/blob/main/imgs/readme/gif_merge.gif?raw=true)
 ## Alias
-In my day to day job I need to access many clusters, and they share very similar names(than you DevOps guys ❤) , let's give them some fancy new ones.
+In my day by day job I need to access many clusters, and they share very similar names(thank you DevOps team ❤) , lets give them some fancy new ones.
 
 ```shell
 kog alias
 ```
 ![](https://github.com/davidemaggi/kog/blob/main/imgs/readme/gif_alias.gif?raw=true)
 
+## Delete
+Bored of a context? Delete it! nobody will notice it
+
+```shell
+kog delete
+```
+![](https://github.com/davidemaggi/kog/blob/main/imgs/readme/gif_delete.gif?raw=true)
+
 ## Info
-Display the current Context and namespace.
+Display the current Context and Namespace.
 Or the raw yaml file if you are brave enough
 ```shell
 kog info
@@ -59,7 +67,7 @@ kog help
 
 ## Global Flags
 
-| Flag      | Alias | Optonal | Description                                                                    | Default               |
+| Flag      | Alias | Optional | Description                                                                    | Default               |
 |-----------|:-----:|:-------:|--------------------------------------------------------------------------------|-----------------------|
 | --config  |  -c   |    x    | The config file to manage| $USERDIR/.kube/config |
 | --force   |  -f   |    x    | Perform the operation forcing it even if no actual action is needed            | false                 |
