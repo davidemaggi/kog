@@ -17,7 +17,7 @@ import (
 
 var kubeconfig string
 
-func GetConfig(kubeConfigPath string) (kubeConfig *api.Config, err error) {
+func GetConfig(kubeConfigPath string) (path string, kubeConfig *api.Config, err error) {
 
 	if kubeConfigPath == "" {
 		kubeConfigPath, err = FindKubeConfig()
@@ -29,11 +29,11 @@ func GetConfig(kubeConfigPath string) (kubeConfig *api.Config, err error) {
 	kubeConfig, err = clientcmd.LoadFromFile(kubeConfigPath)
 	if err != nil {
 		log.Fatal(err)
-		return nil, err
+		return kubeConfigPath, nil, err
 	}
 
 	//log.Printf("current context is %s", kubeConfig.CurrentContext)
-	return kubeConfig, nil
+	return kubeConfigPath, kubeConfig, nil
 	//err = clientcmd.WriteToFile(*kubeConfig, "copy.yaml")
 	//if err != nil {
 	//	log.Fatal(err)
@@ -71,7 +71,7 @@ func PrintConfig(kubeConfigPath string) (err error) {
 func SaveConfig(filePath string, kubeConfig *api.Config, backup bool) (msg string, err error) {
 
 	if backup {
-		oldConfig, _ := GetConfig("")
+		_, oldConfig, _ := GetConfig("")
 		err = clientcmd.WriteToFile(*oldConfig, filePath+".backup")
 		if err != nil {
 			log.Fatal(err)
@@ -103,7 +103,7 @@ func FindKubeConfig() (string, error) {
 func GetContexts(configPath string, verbose bool) (ctxs []string, rawCtxs map[string]*api.Context, err error) {
 	ctxs = make([]string, 0)
 
-	kubeConfig, err := GetConfig(configPath)
+	_, kubeConfig, err := GetConfig(configPath)
 
 	if err != nil {
 		if verbose {
@@ -121,7 +121,7 @@ func GetContexts(configPath string, verbose bool) (ctxs []string, rawCtxs map[st
 
 func GetCurrentContext(configPath string, verbose bool) (ctx string, err error) {
 
-	kubeConfig, err := GetConfig(configPath)
+	_, kubeConfig, err := GetConfig(configPath)
 	if err != nil {
 		if verbose {
 			log.Fatal(err)
@@ -135,7 +135,7 @@ func GetCurrentContext(configPath string, verbose bool) (ctx string, err error) 
 
 func SetContext(configPath string, ctx string, verbose bool) (err error) {
 
-	kubeConfig, err := GetConfig(configPath)
+	_, kubeConfig, err := GetConfig(configPath)
 
 	if err != nil {
 		if verbose {
@@ -158,7 +158,7 @@ func SetContext(configPath string, ctx string, verbose bool) (err error) {
 
 func DeleteContext(configPath string, ctx string, verbose bool) (err error) {
 
-	kubeConfig, err := GetConfig(configPath)
+	_, kubeConfig, err := GetConfig(configPath)
 
 	if err != nil {
 		if verbose {
@@ -190,7 +190,7 @@ func DeleteContext(configPath string, ctx string, verbose bool) (err error) {
 
 func RenameContext(configPath string, ctx string, newName string, verbose bool) (err error) {
 
-	kubeConfig, err := GetConfig(configPath)
+	_, kubeConfig, err := GetConfig(configPath)
 
 	if err != nil {
 		if verbose {
@@ -223,7 +223,7 @@ func RenameContext(configPath string, ctx string, newName string, verbose bool) 
 
 func SetNameSpace(ns string, verbose bool) (err error) {
 
-	kubeConfig, err := GetConfig("")
+	_, kubeConfig, err := GetConfig("")
 
 	if err != nil {
 		if verbose {
@@ -291,10 +291,10 @@ func GetNamespaces(configPath string, verbose bool) (namespaces []string, err er
 func MergeConfigs(newFile string, oldFile string, force bool, verbose bool) (kubeConfig *api.Config, result structs.MergeResult, err error) {
 
 	result = structs.New_MergeResult()
-	oldConfig, err := GetConfig(oldFile)
+	oldPath, oldConfig, err := GetConfig(oldFile)
 
 	result.From = newFile
-	result.To = oldFile
+	result.To = oldPath
 
 	if err != nil {
 		if verbose {
@@ -304,7 +304,7 @@ func MergeConfigs(newFile string, oldFile string, force bool, verbose bool) (kub
 
 	}
 	origConfig := oldConfig.DeepCopy()
-	newConfig, err := GetConfig(newFile)
+	_, newConfig, err := GetConfig(newFile)
 
 	if err != nil {
 		if verbose {
@@ -388,55 +388,6 @@ func MergeConfigs(newFile string, oldFile string, force bool, verbose bool) (kub
 		}
 
 	}
-	//endregion
-
-	//region Extensions
-	/*
-		for ext_id, ext := range newConfig.Extensions {
-			// index is the index where we are
-			// element is the element from someSlice for where we are
-
-			exists := oldConfig.Extensions[ext_id] != nil
-
-			if exists {
-
-				if force {
-					oldConfig.Extensions[ext_id] = ext.DeepCopyObject()
-				}
-
-			} else {
-
-				oldConfig.Extensions[ext_id] = ext.DeepCopyObject()
-			}
-
-		}
-
-	*/
-	//endregion
-
-	//region Extensions 2
-	/*
-		for ext2_id, ext2 := range newConfig.Preferences.Extensions {
-			// index is the index where we are
-			// element is the element from someSlice for where we are
-
-			exists := oldConfig.Preferences.Extensions[ext2_id] != nil
-
-			if exists {
-
-				if force {
-					oldConfig.Preferences.Extensions[ext2_id] = ext2.DeepCopyObject()
-				}
-
-			} else {
-
-				oldConfig.Preferences.Extensions[ext2_id] = ext2.DeepCopyObject()
-			}
-
-		}
-	*/
-
-	//endregion
 
 	_ = origConfig
 	result.IsOk = true
