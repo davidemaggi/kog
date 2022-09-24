@@ -1,6 +1,3 @@
-/*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-*/
 package kog
 
 import (
@@ -11,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var version = "1.0.0-beta-08"
+var version = "1.0.0-rc-01"
 var Verbose bool
 var Force bool
 var ConfigPath string
@@ -20,13 +17,8 @@ var ConfigPath string
 var rootCmd = &cobra.Command{
 	Version: version,
 	Use:     "kog",
-	Short:   "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short:   "Yet another Kubernetes configuration manager.",
+	Long:    `From a lazy developer to other lazy developers, a quick way to manage your kube config file adding, removing switching environment in a lazy way`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },

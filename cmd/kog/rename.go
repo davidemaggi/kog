@@ -6,18 +6,18 @@ import (
 )
 
 // rootCmd represents the base command when called without any subcommands
-var deleteCmd = &cobra.Command{
+var renameCmd = &cobra.Command{
 	Version: version,
-	Use:     "delete",
-	Aliases: []string{"d"},
-	Short:   "Delete the selected context",
-	Long: `This command deletes the selected context from your kubeconfig file.
-Clusters, Users etc... remain untouched`,
+	Use:     "alias",
+	Aliases: []string{"a", "r", "rename"},
+	Short:   "Rename a context",
+	Long: `Too many environments with the same/similar name?
+No problem, give them a new fancier name`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
 	Run: func(cmd *cobra.Command, args []string) {
-		wizard.DeleteContext(ConfigPath, Verbose)
+		wizard.RenameContext(ConfigPath, Verbose)
 
 	},
 }
@@ -31,6 +31,6 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.AddCommand(deleteCmd)
+	rootCmd.AddCommand(renameCmd)
 
 }

@@ -8,6 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var raw bool
+
 // rootCmd represents the base command when called without any subcommands
 var infoCmd = &cobra.Command{
 	Version: version,
@@ -19,7 +21,7 @@ var infoCmd = &cobra.Command{
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
 	Run: func(cmd *cobra.Command, args []string) {
-		wizard.ShowInfo(ConfigPath, Verbose)
+		wizard.ShowInfo(ConfigPath, Verbose, raw)
 
 	},
 }
@@ -33,6 +35,8 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
+
+	infoCmd.Flags().BoolVar(&raw, "raw", false, "Show the entire config")
 	rootCmd.AddCommand(infoCmd)
 
 }

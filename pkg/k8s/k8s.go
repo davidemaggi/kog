@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"errors"
+	"fmt"
 	"github.com/davidemaggi/kog/structs"
 	"golang.org/x/net/context"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,6 +34,33 @@ func GetConfig(kubeConfigPath string) (kubeConfig *api.Config, err error) {
 
 	//log.Printf("current context is %s", kubeConfig.CurrentContext)
 	return kubeConfig, nil
+	//err = clientcmd.WriteToFile(*kubeConfig, "copy.yaml")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+
+}
+
+func PrintConfig(kubeConfigPath string) (err error) {
+
+	if kubeConfigPath == "" {
+		kubeConfigPath, err = FindKubeConfig()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	b, err := os.ReadFile(kubeConfigPath)
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	str := string(b) // convert content to a 'string'
+
+	fmt.Println(str) // print the content as a 'string'
+
+	//log.Printf("current context is %s", kubeConfig.CurrentContext)
+	return nil
 	//err = clientcmd.WriteToFile(*kubeConfig, "copy.yaml")
 	//if err != nil {
 	//	log.Fatal(err)
@@ -147,6 +175,39 @@ func DeleteContext(configPath string, ctx string, verbose bool) (err error) {
 
 	}
 
+	delete(kubeConfig.Contexts, ctx)
+
+	if configPath == "" {
+		configPath, _ = FindKubeConfig()
+	}
+
+	s, err := SaveConfig(configPath, kubeConfig, true)
+
+	_ = s
+	return nil
+
+}
+
+func RenameContext(configPath string, ctx string, newName string, verbose bool) (err error) {
+
+	kubeConfig, err := GetConfig(configPath)
+
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+
+		return err
+	}
+
+	if ctx == kubeConfig.CurrentContext {
+
+		//You are renaming the current default
+		kubeConfig.CurrentContext = newName
+
+	}
+
+	kubeConfig.Contexts[newName] = kubeConfig.Contexts[ctx]
 	delete(kubeConfig.Contexts, ctx)
 
 	if configPath == "" {
