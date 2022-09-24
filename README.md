@@ -82,14 +82,14 @@ Kog is making its first baby steps, It's available as standalone binaries for al
 ### macOS 🍎
 #### Manual 🔨
 1. Download the binary that fits your OS from [Release](https://github.com/davidemaggi/kog/releases) page
-2. Copy kog executable to an accessible directory on your Mac(e.g /usr/local/bin)
+2. Copy kog executable file to an accessible directory on your Mac(e.g /usr/local/bin)
 3. Add the Folder to your PATH Environment variable, if not already configured
 4. Enjoy Kog
 
 ### Linux 🐧
 #### Manual 🔨
 1. Download the binary that fits your OS from [Release](https://github.com/davidemaggi/kog/releases) page
-2. Copy kog.exe file to an accessible directory on your PC(e.g /usr/bin)
+2. Copy kog executable file to an accessible directory on your PC(e.g /usr/bin)
 3. Add the Folder to your PATH Environment variable, if not already configured
 4. Enjoy Kog
 5. 
