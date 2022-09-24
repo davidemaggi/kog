@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var version = "1.0.0-rc-01"
+var version = "1.0.0"
 var Verbose bool
 var Force bool
 var ConfigPath string
