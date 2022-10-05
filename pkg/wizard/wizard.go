@@ -6,6 +6,7 @@ import (
 	"github.com/davidemaggi/kog/pkg/k8s"
 	"github.com/fatih/color"
 	"log"
+	"strings"
 )
 
 func SelectContext(configPath string, verbose bool) (err error) {
@@ -182,6 +183,43 @@ func RenameContext(configPath string, verbose bool) (err error) {
 	}
 
 	k8s.RenameContext(configPath, renCtx, alias, verbose)
+
+	return nil
+}
+
+func PortForwarding(configPath string, verbose bool) (err error) {
+
+	selRes := SelectContext(configPath, verbose)
+
+	if selRes != nil {
+		return selRes
+	}
+
+	fwdWhat := ""
+	promptWhat := &survey.Select{
+		Message: "Entity type to Forward:",
+		Options: []string{"Service", "Pod"},
+		Default: "Service",
+	}
+	err = survey.AskOne(promptWhat, &fwdWhat)
+
+	if err != nil {
+		return err
+	}
+	var toForward = []string{}
+	if strings.ToLower(fwdWhat) == "pod" {
+		toForward, _ = k8s.GetPods(configPath, verbose)
+	}
+	if strings.ToLower(fwdWhat) == "service" {
+		toForward, _ = k8s.GetServices(configPath, verbose)
+	}
+	fwdEntityt := ""
+	promptEntity := &survey.Select{
+		Message: "Entity to Forward:",
+		Options: toForward,
+		Default: "Service",
+	}
+	err = survey.AskOne(promptEntity, &fwdEntityt)
 
 	return nil
 }

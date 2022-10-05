@@ -394,3 +394,95 @@ func MergeConfigs(newFile string, oldFile string, force bool, verbose bool) (kub
 
 	return oldConfig, result, nil
 }
+
+func GetPods(configPath string, verbose bool) (pods []string, err error) {
+	if configPath == "" {
+		configPath, err = FindKubeConfig()
+	}
+
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+
+		return pods, err
+	}
+	config, err := clientcmd.BuildConfigFromFlags("", configPath)
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+		return pods, err
+	}
+
+	// create the clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+		return pods, err
+
+	}
+
+	var podsList, errNs = clientset.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
+	if errNs != nil {
+
+		if verbose {
+			log.Fatal(errNs)
+		}
+		return pods, errNs
+
+	}
+	for _, pod := range podsList.Items {
+		pods = append(pods, pod.Name)
+	}
+	return pods, nil
+
+}
+
+func GetServices(configPath string, verbose bool) (services []string, err error) {
+	if configPath == "" {
+		configPath, err = FindKubeConfig()
+	}
+
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+
+		return services, err
+	}
+	config, err := clientcmd.BuildConfigFromFlags("", configPath)
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+		return services, err
+	}
+
+	// create the clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+		return services, err
+
+	}
+
+	var svcList, errNs = clientset.CoreV1().Services("").List(context.TODO(), metav1.ListOptions{})
+	if errNs != nil {
+
+		if verbose {
+			log.Fatal(errNs)
+		}
+		return services, errNs
+
+	}
+	for _, svc := range svcList.Items {
+		services = append(services, svc.Name)
+	}
+	return services, nil
+
+}
