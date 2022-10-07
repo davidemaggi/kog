@@ -5,6 +5,7 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/davidemaggi/kog/pkg/k8s"
 	"github.com/fatih/color"
+	v1 "k8s.io/api/core/v1"
 	"log"
 	"strings"
 )
@@ -207,19 +208,39 @@ func PortForwarding(configPath string, verbose bool) (err error) {
 		return err
 	}
 	var toForward = []string{}
+	var pods []v1.Pod
+	var services []v1.Service
+
 	if strings.ToLower(fwdWhat) == "pod" {
-		toForward, _ = k8s.GetPods(configPath, verbose)
+		toForward, pods, _ = k8s.GetPods(configPath, verbose)
 	}
 	if strings.ToLower(fwdWhat) == "service" {
-		toForward, _ = k8s.GetServices(configPath, verbose)
+		toForward, services, _ = k8s.GetServices(configPath, verbose)
+
 	}
 	fwdEntityt := ""
 	promptEntity := &survey.Select{
 		Message: "Entity to Forward:",
 		Options: toForward,
-		Default: "Service",
 	}
 	err = survey.AskOne(promptEntity, &fwdEntityt)
+
+	if strings.ToLower(fwdWhat) == "pod" {
+		for i := range pods {
+			if pods[i].Name == fwdEntityt {
+
+				k8s.PortForwardPod(configPath, pods[i], 80, 8080, false)
+			}
+		}
+	}
+	if strings.ToLower(fwdWhat) == "service" {
+		for i := range services {
+			if services[i].Name == fwdEntityt {
+				k8s.PortForwardSvc(configPath, services[i], 80, 8080, false)
+			}
+		}
+	}
+	_ = toForward
 
 	return nil
 }

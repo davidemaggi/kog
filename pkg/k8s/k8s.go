@@ -5,14 +5,21 @@ import (
 	"fmt"
 	"github.com/davidemaggi/kog/structs"
 	"golang.org/x/net/context"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
+	"k8s.io/client-go/tools/portforward"
+	"k8s.io/client-go/transport/spdy"
 	"k8s.io/client-go/util/homedir"
 	"log"
+	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var kubeconfig string
@@ -395,7 +402,7 @@ func MergeConfigs(newFile string, oldFile string, force bool, verbose bool) (kub
 	return oldConfig, result, nil
 }
 
-func GetPods(configPath string, verbose bool) (pods []string, err error) {
+func GetPods(configPath string, verbose bool) (podsString []string, pods []v1.Pod, err error) {
 	if configPath == "" {
 		configPath, err = FindKubeConfig()
 	}
@@ -405,14 +412,14 @@ func GetPods(configPath string, verbose bool) (pods []string, err error) {
 			log.Fatal(err)
 		}
 
-		return pods, err
+		return podsString, nil, err
 	}
 	config, err := clientcmd.BuildConfigFromFlags("", configPath)
 	if err != nil {
 		if verbose {
 			log.Fatal(err)
 		}
-		return pods, err
+		return podsString, nil, err
 	}
 
 	// create the clientset
@@ -421,7 +428,7 @@ func GetPods(configPath string, verbose bool) (pods []string, err error) {
 		if verbose {
 			log.Fatal(err)
 		}
-		return pods, err
+		return podsString, nil, err
 
 	}
 
@@ -431,17 +438,17 @@ func GetPods(configPath string, verbose bool) (pods []string, err error) {
 		if verbose {
 			log.Fatal(errNs)
 		}
-		return pods, errNs
+		return podsString, nil, errNs
 
 	}
 	for _, pod := range podsList.Items {
-		pods = append(pods, pod.Name)
+		podsString = append(podsString, pod.Name)
 	}
-	return pods, nil
+	return podsString, podsList.Items, nil
 
 }
 
-func GetServices(configPath string, verbose bool) (services []string, err error) {
+func GetServices(configPath string, verbose bool) (servicesString []string, services []v1.Service, err error) {
 	if configPath == "" {
 		configPath, err = FindKubeConfig()
 	}
@@ -451,14 +458,14 @@ func GetServices(configPath string, verbose bool) (services []string, err error)
 			log.Fatal(err)
 		}
 
-		return services, err
+		return servicesString, nil, err
 	}
 	config, err := clientcmd.BuildConfigFromFlags("", configPath)
 	if err != nil {
 		if verbose {
 			log.Fatal(err)
 		}
-		return services, err
+		return servicesString, nil, err
 	}
 
 	// create the clientset
@@ -467,7 +474,7 @@ func GetServices(configPath string, verbose bool) (services []string, err error)
 		if verbose {
 			log.Fatal(err)
 		}
-		return services, err
+		return servicesString, nil, err
 
 	}
 
@@ -477,12 +484,107 @@ func GetServices(configPath string, verbose bool) (services []string, err error)
 		if verbose {
 			log.Fatal(errNs)
 		}
-		return services, errNs
+		return servicesString, nil, errNs
 
 	}
 	for _, svc := range svcList.Items {
-		services = append(services, svc.Name)
-	}
-	return services, nil
+		servicesString = append(servicesString, svc.Name)
 
+	}
+	return servicesString, svcList.Items, nil
+
+}
+
+func PortForwardSvc(configPath string, svc v1.Service, fwdPort int, localPort int, verbose bool) (err error) {
+
+	if configPath == "" {
+		configPath, err = FindKubeConfig()
+	}
+
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+
+		return err
+	}
+	config, err := clientcmd.BuildConfigFromFlags("", configPath)
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+		return err
+	}
+
+	path := ""
+
+	path = fmt.Sprintf("/api/v1/namespaces/%s/services/%s/portforward",
+		svc.Namespace, svc.Name)
+
+	hostIP := strings.TrimLeft(config.Host, "htps:/")
+
+	transport, upgrader, err := spdy.RoundTripperFor(config)
+	if err != nil {
+		return err
+	}
+
+	var Streams genericclioptions.IOStreams
+	// StopCh is the channel used to manage the port forward lifecycle
+	var StopCh <-chan struct{}
+	// ReadyCh communicates when the tunnel is ready to receive traffic
+	var ReadyCh chan struct{}
+
+	dialer := spdy.NewDialer(upgrader, &http.Client{Transport: transport}, http.MethodPost, &url.URL{Scheme: "https", Path: path, Host: hostIP})
+	fw, err := portforward.New(dialer, []string{fmt.Sprintf("%d:%d", localPort, fwdPort)}, StopCh, ReadyCh, Streams.Out, Streams.ErrOut)
+	if err != nil {
+		return err
+	}
+	return fw.ForwardPorts()
+}
+
+func PortForwardPod(configPath string, pod v1.Pod, fwdPort int, localPort int, verbose bool) (err error) {
+
+	if configPath == "" {
+		configPath, err = FindKubeConfig()
+	}
+
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+
+		return err
+	}
+	config, err := clientcmd.BuildConfigFromFlags("", configPath)
+	if err != nil {
+		if verbose {
+			log.Fatal(err)
+		}
+		return err
+	}
+
+	path := ""
+
+	path = fmt.Sprintf("/api/v1/namespaces/%s/pods/%s/portforward",
+		pod.Namespace, pod.Name)
+
+	hostIP := strings.TrimLeft(config.Host, "htps:/")
+
+	transport, upgrader, err := spdy.RoundTripperFor(config)
+	if err != nil {
+		return err
+	}
+
+	var Streams genericclioptions.IOStreams
+	// StopCh is the channel used to manage the port forward lifecycle
+	var StopCh <-chan struct{}
+	// ReadyCh communicates when the tunnel is ready to receive traffic
+	var ReadyCh chan struct{}
+
+	dialer := spdy.NewDialer(upgrader, &http.Client{Transport: transport}, http.MethodPost, &url.URL{Scheme: "https", Path: path, Host: hostIP})
+	fw, err := portforward.New(dialer, []string{fmt.Sprintf("%d:%d", localPort, fwdPort)}, StopCh, ReadyCh, Streams.Out, Streams.ErrOut)
+	if err != nil {
+		return err
+	}
+	return fw.ForwardPorts()
 }
