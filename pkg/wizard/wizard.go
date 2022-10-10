@@ -7,6 +7,7 @@ import (
 	"github.com/fatih/color"
 	v1 "k8s.io/api/core/v1"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -229,14 +230,68 @@ func PortForwarding(configPath string, verbose bool) (err error) {
 		for i := range pods {
 			if pods[i].Name == fwdEntityt {
 
-				k8s.PortForwardPod(configPath, pods[i], 80, 8080, false)
+				fwdPort := "0"
+
+				var ports = []string{}
+
+				for ci := range pods[i].Spec.Containers {
+					for pi := range pods[i].Spec.Containers[ci].Ports {
+						ports = append(ports, fmt.Sprintf("%s: %d",
+							pods[i].Spec.Containers[ci].Ports[pi].Protocol, pods[i].Spec.Containers[ci].Ports[pi].ContainerPort))
+					}
+				}
+
+				promptPort := &survey.Select{
+					Message: "Port to forward:",
+					Options: ports,
+				}
+				err = survey.AskOne(promptPort, &fwdPort)
+
+				localport := "0"
+				promptlocalPort := &survey.Input{
+					Message: "On Local port",
+				}
+				survey.AskOne(promptlocalPort, &localport)
+
+				portInt, _ := strconv.Atoi(fwdPort[5:])
+				localportInt, _ := strconv.Atoi(localport)
+
+				k8s.PortForwardPod(configPath, pods[i], portInt, localportInt, false)
 			}
 		}
 	}
 	if strings.ToLower(fwdWhat) == "service" {
 		for i := range services {
 			if services[i].Name == fwdEntityt {
-				k8s.PortForwardSvc(configPath, services[i], 80, 8080, false)
+
+				fwdPort := "0"
+
+				var ports = []string{}
+
+				for pi := range services[i].Spec.Ports {
+
+					ports = append(ports, fmt.Sprintf("%s: %d",
+						services[i].Spec.Ports[pi].Protocol, services[i].Spec.Ports[pi].Port))
+
+				}
+
+				promptPort := &survey.Select{
+					Message: "Port to forward:",
+					Options: ports,
+				}
+				err = survey.AskOne(promptPort, &fwdPort)
+
+				localport := "0"
+				promptlocalPort := &survey.Input{
+					Message: "On Local port",
+				}
+				survey.AskOne(promptlocalPort, &localport)
+				portInt, _ := strconv.Atoi(fwdPort[5:])
+				localportInt, _ := strconv.Atoi(localport)
+
+				k8s.PortForwardSvc(
+					configPath, services[i], portInt, localportInt, false)
+
 			}
 		}
 	}

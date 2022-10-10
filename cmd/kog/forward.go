@@ -37,7 +37,7 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 
-	fwdCmd.Flags().BoolVar(&raw, "raw", false, "Show the entire config")
+	//fwdCmd.Flags().BoolVar(&raw, "raw", false, "Show the entire config")
 	rootCmd.AddCommand(fwdCmd)
 
 }
