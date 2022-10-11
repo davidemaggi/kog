@@ -256,7 +256,7 @@ func PortForwarding(configPath string, verbose bool) (err error) {
 				portInt, _ := strconv.Atoi(fwdPort[5:])
 				localportInt, _ := strconv.Atoi(localport)
 
-				k8s.PortForwardPod(configPath, pods[i], portInt, localportInt, false)
+				k8s.PortForwardPod(configPath, &pods[i], int32(portInt), int32(localportInt), false)
 			}
 		}
 	}
@@ -289,8 +289,13 @@ func PortForwarding(configPath string, verbose bool) (err error) {
 				portInt, _ := strconv.Atoi(fwdPort[5:])
 				localportInt, _ := strconv.Atoi(localport)
 
-				k8s.PortForwardSvc(
-					configPath, services[i], portInt, localportInt, false)
+				for pi := range services[i].Spec.Ports {
+
+					if services[i].Spec.Ports[pi].Port == int32(portInt) {
+						k8s.PortForwardSvc(
+							configPath, &services[i], services[i].Spec.Ports[pi].TargetPort.IntVal, int32(localportInt), false)
+					}
+				}
 
 			}
 		}

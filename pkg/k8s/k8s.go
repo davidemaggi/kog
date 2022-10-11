@@ -7,6 +7,7 @@ import (
 	"golang.org/x/net/context"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -403,36 +404,10 @@ func MergeConfigs(newFile string, oldFile string, force bool, verbose bool) (kub
 }
 
 func GetPods(configPath string, verbose bool) (podsString []string, pods []v1.Pod, err error) {
-	if configPath == "" {
-		configPath, err = FindKubeConfig()
-	}
 
-	if err != nil {
-		if verbose {
-			log.Fatal(err)
-		}
+	kc, err := getKubeClient(configPath, verbose)
 
-		return podsString, nil, err
-	}
-	config, err := clientcmd.BuildConfigFromFlags("", configPath)
-	if err != nil {
-		if verbose {
-			log.Fatal(err)
-		}
-		return podsString, nil, err
-	}
-
-	// create the clientset
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		if verbose {
-			log.Fatal(err)
-		}
-		return podsString, nil, err
-
-	}
-
-	var podsList, errNs = clientset.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
+	var podsList, errNs = kc.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
 	if errNs != nil {
 
 		if verbose {
@@ -449,36 +424,9 @@ func GetPods(configPath string, verbose bool) (podsString []string, pods []v1.Po
 }
 
 func GetServices(configPath string, verbose bool) (servicesString []string, services []v1.Service, err error) {
-	if configPath == "" {
-		configPath, err = FindKubeConfig()
-	}
+	kc, err := getKubeClient(configPath, verbose)
 
-	if err != nil {
-		if verbose {
-			log.Fatal(err)
-		}
-
-		return servicesString, nil, err
-	}
-	config, err := clientcmd.BuildConfigFromFlags("", configPath)
-	if err != nil {
-		if verbose {
-			log.Fatal(err)
-		}
-		return servicesString, nil, err
-	}
-
-	// create the clientset
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		if verbose {
-			log.Fatal(err)
-		}
-		return servicesString, nil, err
-
-	}
-
-	var svcList, errNs = clientset.CoreV1().Services("").List(context.TODO(), metav1.ListOptions{})
+	var svcList, errNs = kc.CoreV1().Services("").List(context.TODO(), metav1.ListOptions{})
 	if errNs != nil {
 
 		if verbose {
@@ -495,8 +443,19 @@ func GetServices(configPath string, verbose bool) (servicesString []string, serv
 
 }
 
-func PortForwardSvc(configPath string, svc v1.Service, fwdPort int, localPort int, verbose bool) (err error) {
+func PortForwardSvc(configPath string, svc *v1.Service, fwdPort int32, localPort int32, verbose bool) (err error) {
 
+	kc, err := getKubeClient(configPath, verbose)
+
+	pods, err := getPodsForSvc(svc, svc.Namespace, kc)
+
+	PortForwardPod(configPath, &pods.Items[0], fwdPort, localPort, verbose)
+
+	return nil
+
+}
+
+func getKubeClient(configPath string, verbose bool) (client *kubernetes.Clientset, err error) {
 	if configPath == "" {
 		configPath, err = FindKubeConfig()
 	}
@@ -506,43 +465,24 @@ func PortForwardSvc(configPath string, svc v1.Service, fwdPort int, localPort in
 			log.Fatal(err)
 		}
 
-		return err
+		return nil, err
 	}
 	config, err := clientcmd.BuildConfigFromFlags("", configPath)
 	if err != nil {
 		if verbose {
 			log.Fatal(err)
 		}
-		return err
+		return nil, err
 	}
 
-	path := ""
+	// create the clientset
+	clientset, err := kubernetes.NewForConfig(config)
 
-	path = fmt.Sprintf("/api/v1/namespaces/%s/services/%s/portforward",
-		svc.Namespace, svc.Name)
+	return clientset, err
 
-	hostIP := strings.TrimLeft(config.Host, "htps:/")
-
-	transport, upgrader, err := spdy.RoundTripperFor(config)
-	if err != nil {
-		return err
-	}
-
-	var Streams genericclioptions.IOStreams
-	// StopCh is the channel used to manage the port forward lifecycle
-	var StopCh <-chan struct{}
-	// ReadyCh communicates when the tunnel is ready to receive traffic
-	var ReadyCh chan struct{}
-
-	dialer := spdy.NewDialer(upgrader, &http.Client{Transport: transport}, http.MethodPost, &url.URL{Scheme: "https", Path: path, Host: hostIP})
-	fw, err := portforward.New(dialer, []string{fmt.Sprintf("%d:%d", localPort, fwdPort)}, StopCh, ReadyCh, Streams.Out, Streams.ErrOut)
-	if err != nil {
-		return err
-	}
-	return fw.ForwardPorts()
 }
 
-func PortForwardPod(configPath string, pod v1.Pod, fwdPort int, localPort int, verbose bool) (err error) {
+func PortForwardPod(configPath string, pod *v1.Pod, fwdPort int32, localPort int32, verbose bool) (err error) {
 
 	if configPath == "" {
 		configPath, err = FindKubeConfig()
@@ -587,4 +527,12 @@ func PortForwardPod(configPath string, pod v1.Pod, fwdPort int, localPort int, v
 		return err
 	}
 	return fw.ForwardPorts()
+}
+
+func getPodsForSvc(svc *v1.Service, namespace string, k8sClient *kubernetes.Clientset) (*v1.PodList, error) {
+	set := labels.Set(svc.Spec.Selector)
+	listOptions := metav1.ListOptions{LabelSelector: set.AsSelector().String()}
+	pods, err := k8sClient.CoreV1().Pods(namespace).List(context.TODO(), listOptions)
+
+	return pods, err
 }
