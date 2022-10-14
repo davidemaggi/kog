@@ -2,24 +2,22 @@ package merge
 
 import (
 	"fmt"
+	"os"
+	"strconv"
+
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/davidemaggi/kog/pkg/common"
 	"github.com/davidemaggi/kog/pkg/k8s"
 	"github.com/davidemaggi/kog/structs"
 	"github.com/olekukonko/tablewriter"
-	"log"
-	"os"
-	"strconv"
 )
 
 func MergeConfig(path2Merge string, ConfigPath string, Force bool, Verbose bool) {
 
 	newConf, mergeResult, err := k8s.MergeConfigs(path2Merge, ConfigPath, Force, Verbose)
 
-	if err != nil {
-		if Verbose {
-			log.Fatal(err)
-		}
-	}
+	common.HandleError(err, "Error Merging Configs", Verbose)
+
 	if !mergeResult.IsOk {
 		fmt.Println(mergeResult.Msg)
 	} else {
