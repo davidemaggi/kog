@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/davidemaggi/kog/pkg/common"
 	"github.com/davidemaggi/kog/pkg/k8s"
 	v1 "k8s.io/api/core/v1"
 )
@@ -26,7 +27,7 @@ func PortForwarding(configPath string, verbose bool) (err error) {
 	}
 	err = survey.AskOne(promptWhat, &fwdWhat)
 
-	if err != nil {
+	if !common.HandleError(err, "Error Selecting Context", verbose) {
 		return err
 	}
 	var toForward = []string{}
@@ -34,18 +35,27 @@ func PortForwarding(configPath string, verbose bool) (err error) {
 	var services []v1.Service
 
 	if strings.ToLower(fwdWhat) == "pod" {
-		toForward, pods, _ = k8s.GetPods(configPath, verbose)
+		toForward, pods, err = k8s.GetPods(configPath, verbose)
 	}
 	if strings.ToLower(fwdWhat) == "service" {
-		toForward, services, _ = k8s.GetServices(configPath, verbose)
+		toForward, services, err = k8s.GetServices(configPath, verbose)
 
 	}
+
+	if !common.HandleError(err, "Error getting entities", verbose) {
+		return err
+	}
+
 	fwdEntityt := ""
 	promptEntity := &survey.Select{
 		Message: "Entity to Forward:",
 		Options: toForward,
 	}
 	err = survey.AskOne(promptEntity, &fwdEntityt)
+
+	if !common.HandleError(err, "Error Selecting Entity to forward", verbose) {
+		return err
+	}
 
 	if strings.ToLower(fwdWhat) == "pod" {
 		for i := range pods {
@@ -74,8 +84,14 @@ func PortForwarding(configPath string, verbose bool) (err error) {
 				}
 				survey.AskOne(promptlocalPort, &localport)
 
-				portInt, _ := strconv.Atoi(fwdPort[5:])
-				localportInt, _ := strconv.Atoi(localport)
+				portInt, err := strconv.Atoi(fwdPort[5:])
+				if !common.HandleError(err, "Error converting Port", verbose) {
+					return err
+				}
+				localportInt, err := strconv.Atoi(localport)
+				if !common.HandleError(err, "Error converting Port", verbose) {
+					return err
+				}
 
 				k8s.PortForwardPod(configPath, &pods[i], int32(portInt), int32(localportInt), false)
 			}
@@ -107,8 +123,14 @@ func PortForwarding(configPath string, verbose bool) (err error) {
 					Message: "On Local port",
 				}
 				survey.AskOne(promptlocalPort, &localport)
-				portInt, _ := strconv.Atoi(fwdPort[5:])
-				localportInt, _ := strconv.Atoi(localport)
+				portInt, err := strconv.Atoi(fwdPort[5:])
+				if !common.HandleError(err, "Error converting Port", verbose) {
+					return err
+				}
+				localportInt, err := strconv.Atoi(localport)
+				if !common.HandleError(err, "Error converting Port", verbose) {
+					return err
+				}
 
 				for pi := range services[i].Spec.Ports {
 
