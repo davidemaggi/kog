@@ -36,6 +36,15 @@ kog delete
 ```
 ![](https://github.com/davidemaggi/kog/blob/main/imgs/readme/gif_delete.gif?raw=true)
 
+## Port Forwarding
+A wizard based port forwarding configuration.
+
+```shell
+kog forward
+```
+![](https://github.com/davidemaggi/kog/blob/main/imgs/readme/gif_fwd.gif?raw=true)
+
+
 ## Info
 Display the current Context and Namespace.
 Or the raw yaml file if you are brave enough
