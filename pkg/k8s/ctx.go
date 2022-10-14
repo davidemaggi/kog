@@ -50,7 +50,7 @@ func SetContext(configPath string, ctx string, verbose bool) (err error) {
 
 }
 
-func DeleteContext(configPath string, ctx string, verbose bool) (err error) {
+func DeleteContext(configPath string, ctx string, force bool, verbose bool) (err error) {
 
 	_, kubeConfig, err := GetConfig(configPath)
 
@@ -65,7 +65,15 @@ func DeleteContext(configPath string, ctx string, verbose bool) (err error) {
 
 	}
 
+	toRemove := kubeConfig.Contexts[ctx]
+
 	delete(kubeConfig.Contexts, ctx)
+
+	if force {
+		delete(kubeConfig.AuthInfos, toRemove.AuthInfo)
+		delete(kubeConfig.Clusters, toRemove.Cluster)
+
+	}
 
 	if configPath == "" {
 		configPath, _ = FindKubeConfig()

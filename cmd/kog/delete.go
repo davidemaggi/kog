@@ -17,7 +17,7 @@ Clusters, Users etc... remain untouched`,
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
 	Run: func(cmd *cobra.Command, args []string) {
-		wizard.DeleteContext(ConfigPath, Verbose)
+		wizard.DeleteContext(ConfigPath, Force, Verbose)
 
 	},
 }

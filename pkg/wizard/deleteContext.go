@@ -6,7 +6,7 @@ import (
 	"github.com/davidemaggi/kog/pkg/k8s"
 )
 
-func DeleteContext(configPath string, verbose bool) (err error) {
+func DeleteContext(configPath string, force bool, verbose bool) (err error) {
 
 	ctxs, _, err := k8s.GetContexts(configPath, verbose)
 
@@ -28,7 +28,7 @@ func DeleteContext(configPath string, verbose bool) (err error) {
 
 	}
 
-	k8s.DeleteContext(configPath, delCtx, verbose)
+	k8s.DeleteContext(configPath, delCtx, force, verbose)
 
 	return nil
 }
