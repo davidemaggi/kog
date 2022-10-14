@@ -14,7 +14,7 @@ func GetContexts(configPath string, verbose bool) (ctxs []string, rawCtxs map[st
 		return ctxs, nil, err
 	}
 
-	for s, _ := range kubeConfig.Contexts {
+	for s := range kubeConfig.Contexts {
 		ctxs = append(ctxs, s)
 	}
 	return ctxs, kubeConfig.Contexts, nil
