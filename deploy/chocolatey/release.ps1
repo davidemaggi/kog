@@ -70,6 +70,8 @@ $chocoScript=$chocoScript.Replace("@@HASH_X86@@",$md5x86.Hash)+""
 
 Out-File -FilePath .\tools\chocolateyinstall.ps1 -InputObject $chocoScript
 
+Remove-Item -Path .\tools\chocoTmp.ps1
+
 choco pack kog.nuspec
 $nupkg="kog."+$tagStrip+".nupkg"
 choco push $nupkg --source https://push.chocolatey.org/

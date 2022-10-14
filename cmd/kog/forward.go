@@ -1,3 +1,6 @@
+/*
+Copyright © 2022 NAME HERE <EMAIL ADDRESS>
+*/
 package kog
 
 import (
@@ -6,18 +9,20 @@ import (
 )
 
 // rootCmd represents the base command when called without any subcommands
-var deleteCmd = &cobra.Command{
+var fwdCmd = &cobra.Command{
 	Version: version,
-	Use:     "delete",
-	Aliases: []string{"d"},
-	Short:   "Delete the selected context",
-	Long: `This command deletes the selected context from your kubeconfig file.
-Clusters, Users etc... remain untouched`,
+	Use:     "forward",
+	Aliases: []string{"f", "fwd"},
+	Short:   "Forward a service on localhost",
+	Long:    `A wizard to guide you on port forwarding configuration`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
 	Run: func(cmd *cobra.Command, args []string) {
-		wizard.DeleteContext(ConfigPath, Force, Verbose)
+		err := wizard.PortForwarding(ConfigPath, Verbose)
+		if err != nil {
+			return
+		}
 
 	},
 }
@@ -31,6 +36,8 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.AddCommand(deleteCmd)
+
+	//fwdCmd.Flags().BoolVar(&raw, "raw", false, "Show the entire config")
+	rootCmd.AddCommand(fwdCmd)
 
 }
