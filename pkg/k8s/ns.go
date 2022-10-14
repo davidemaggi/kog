@@ -45,3 +45,29 @@ func GetNamespaces(configPath string, verbose bool) (namespaces []string, err er
 	return namespaces, nil
 
 }
+
+func GetCurrentNamespace(configPath string, verbose bool) (namespace string, err error) {
+
+	// create the clientset
+	_, config, err := GetConfig(configPath)
+
+	if !common.HandleError(err, "Error Getting Config", verbose) {
+		return "", err
+
+	}
+
+	curCtx, err := GetCurrentContext(configPath, verbose)
+
+	if !common.HandleError(err, "Error Getting Current Context", verbose) {
+		return "", err
+
+	}
+
+	if config.Contexts[curCtx] != nil {
+		return config.Contexts[curCtx].Namespace, nil
+
+	}
+
+	return "", nil
+
+}

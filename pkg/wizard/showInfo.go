@@ -10,26 +10,23 @@ import (
 func ShowInfo(configPath string, verbose bool, raw bool) (err error) {
 
 	if !raw {
-		_, rawCtxs, _ := k8s.GetContexts(configPath, verbose)
 
 		currentCtx, _ := k8s.GetCurrentContext(configPath, verbose)
 
-		cur := rawCtxs[currentCtx]
+		currentNs, _ := k8s.GetCurrentNamespace(configPath, verbose)
 
-		if cur != nil {
-			cyan := color.New(color.FgCyan).SprintFunc()
-			red := color.New(color.FgRed).SprintFunc()
+		cyan := color.New(color.FgCyan).SprintFunc()
+		red := color.New(color.FgRed).SprintFunc()
 
-			fmt.Printf("Current Context is %s.\n", cyan(currentCtx))
-			if cur.Namespace != "" {
-				fmt.Printf("Current NameSpace is %s.\n", cyan(cur.Namespace))
+		fmt.Printf("Current Context is %s\n", cyan(currentCtx))
+		if currentNs != "" {
+			fmt.Printf("Current NameSpace is %s\n", cyan(currentNs))
 
-			} else {
-				fmt.Printf("Current NameSpace is %s.\n", red("not set"))
-
-			}
+		} else {
+			fmt.Printf("Current NameSpace is %s\n", red("not set"))
 
 		}
+
 	} else {
 		k8s.PrintConfig(configPath)
 
