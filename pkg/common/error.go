@@ -8,8 +8,8 @@ func HandleError(err error, msg string, verbose bool) (ret bool) {
 			log.Fatal(err)
 		}
 
-		return true
+		return false
 	}
 
-	return false
+	return true
 }
