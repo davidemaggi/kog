@@ -46,7 +46,8 @@ func PortForwardPod(configPath string, pod *v1.Pod, fwdPort int32, localPort int
 	path = fmt.Sprintf("/api/v1/namespaces/%s/pods/%s/portforward",
 		pod.Namespace, pod.Name)
 
-	hostIP := strings.TrimLeft(config.Host, "htps:/")
+	hostIP := strings.TrimLeft(config.Host, "htps:")
+	hostIP = strings.TrimLeft(hostIP, "/")
 
 	transport, upgrader, err := spdy.RoundTripperFor(config)
 	if !common.HandleError(err, "Error Setting up port forward", verbose) {
@@ -64,7 +65,13 @@ func PortForwardPod(configPath string, pod *v1.Pod, fwdPort int32, localPort int
 	if !common.HandleError(err, "Error Executing port forward", verbose) {
 		return err
 	}
-	return fw.ForwardPorts()
+	tmpFwd := fw.ForwardPorts()
+	if tmpFwd != nil {
+		if !common.HandleError(tmpFwd, "Error Executing port forward", verbose) {
+			return tmpFwd
+		}
+	}
+	return tmpFwd
 }
 func getPodsForSvc(svc *v1.Service, namespace string, k8sClient *kubernetes.Clientset) (*v1.PodList, error) {
 	set := labels.Set(svc.Spec.Selector)
