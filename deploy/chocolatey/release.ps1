@@ -9,6 +9,9 @@ choco install windows-sdk-10-version-2104-all -y
 choco apikey --key $env:CHOCO_TOKEN --source https://push.chocolatey.org/
 #Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\"
 
+echo $env:CHOCO_TOKEN
+echo $env:CERTIFICATE
+echo $env:CODE_SIGN
 
 $tag=$env:RELEASE
 $tagStrip=$tag.substring(1)
